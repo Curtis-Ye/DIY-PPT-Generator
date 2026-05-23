@@ -1,0 +1,58 @@
+# ============================================================
+# DIY PPT Generator - Configuration
+# ============================================================
+
+# Slide dimensions (inches)
+slide:
+  width: 13.33   # 16:9 widescreen
+  height: 7.5
+
+# Theme color palette
+theme:
+  name: blue
+  primary: "#0057B8"
+  secondary: "#DDEEFF"
+  accent: "#FF6B35"
+  text_dark: "#1A1A2E"
+  text_light: "#FFFFFF"
+  background: "#FAFAFA"
+
+# Alternative themes (uncomment to use)
+# theme:
+#   name: dark
+#   primary: "#1E1E2E"
+#   secondary: "#313244"
+#   accent: "#89B4FA"
+#   text_dark: "#CDD6F4"
+#   text_light: "#1E1E2E"
+#   background: "#181825"
+#
+# theme:
+#   name: green
+#   primary: "#2D6A4F"
+#   secondary: "#D8F3DC"
+#   accent: "#FFB703"
+#   text_dark: "#1B2021"
+#   text_light: "#FFFFFF"
+#   background: "#F8F9FA"
+
+# Fonts (Windows)
+font:
+  title: Microsoft YaHei     # 标题字体
+  body: Microsoft YaHei      # 正文字体
+  title_size: 32             # 标题字号 (pt)
+  body_size: 18              # 正文字号 (pt)
+  subtitle_size: 20          # 副标题字号 (pt)
+
+# Content density
+content:
+  max_bullets: 6             # 每页最多要点数
+  max_words_per_bullet: 20   # 每个要点最多字数
+  max_slides: 20             # 总页数上限
+
+# Output
+output:
+  format: pptx
+  add_slide_numbers: true
+  add_page_logo: false
+  logo_path: ""
