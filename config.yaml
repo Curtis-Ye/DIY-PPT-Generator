@@ -2,12 +2,29 @@
 # DIY PPT Generator - Configuration
 # ============================================================
 
+# ----------------------------------------------------------
 # Slide dimensions (inches)
+# ----------------------------------------------------------
 slide:
-  width: 13.33   # 16:9 widescreen
+  width: 13.33          # 16:9 widescreen
   height: 7.5
 
-# Theme color palette
+# ----------------------------------------------------------
+# Template
+# ----------------------------------------------------------
+# 使用自定义 PPT 模板：将 .pptx 模板放入 templates/ 目录，在此指定路径
+# 留空则使用内置程序化样式
+template:
+  path: ""              # 例如: templates/my_theme.pptx
+  # 版式索引映射 — 模板中每种版式对应的 slide layout 编号（从 0 开始）
+  # TITLE: 封面    TEXT: 正文    IMAGE_TEXT: 图文混排
+  # RESULT: 数据   FLOWCHART: 流程图   SECTION: 分隔页   END: 结束页
+  # 留空使用默认映射
+  layout_mapping: {}
+
+# ----------------------------------------------------------
+# Theme colors
+# ----------------------------------------------------------
 theme:
   name: blue
   primary: "#0057B8"
@@ -17,7 +34,7 @@ theme:
   text_light: "#FFFFFF"
   background: "#FAFAFA"
 
-# Alternative themes (uncomment to use)
+# 备选主题（取消注释即可切换）
 # theme:
 #   name: dark
 #   primary: "#1E1E2E"
@@ -36,21 +53,41 @@ theme:
 #   text_light: "#FFFFFF"
 #   background: "#F8F9FA"
 
-# Fonts (Windows)
+# ----------------------------------------------------------
+# Fonts — 每个层级独立配置
+# ----------------------------------------------------------
 font:
-  title: Microsoft YaHei     # 标题字体
-  body: Microsoft YaHei      # 正文字体
-  title_size: 32             # 标题字号 (pt)
-  body_size: 18              # 正文字号 (pt)
-  subtitle_size: 20          # 副标题字号 (pt)
+  # 字体名称（可设为系统中任意已安装字体）
+  cover_title: Microsoft YaHei        # 封面大标题
+  cover_subtitle: Microsoft YaHei     # 封面副标题
+  cover_info: Microsoft YaHei         # 封面作者/日期
+  heading: Microsoft YaHei            # 内容页标题
+  body: Microsoft YaHei               # 正文 bullet
+  caption: Microsoft YaHei            # 图表标注 / 占位提示
+  page_number: Microsoft YaHei        # 页码
 
-# Content density
+  # 字号 (pt)
+  cover_title_size: 40
+  cover_subtitle_size: 20
+  cover_info_size: 14
+  heading_size: 32
+  body_size: 18
+  caption_size: 12
+  page_number_size: 10
+  section_number_size: 72             # 章节分隔页大数字
+  end_title_size: 44                  # 结束页"谢谢"
+
+# ----------------------------------------------------------
+# Content limits
+# ----------------------------------------------------------
 content:
-  max_bullets: 6             # 每页最多要点数
-  max_words_per_bullet: 20   # 每个要点最多字数
-  max_slides: 20             # 总页数上限
+  max_bullets: 6
+  max_words_per_bullet: 20
+  max_slides: 30
 
+# ----------------------------------------------------------
 # Output
+# ----------------------------------------------------------
 output:
   format: pptx
   add_slide_numbers: true

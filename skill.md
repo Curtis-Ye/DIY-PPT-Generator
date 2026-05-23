@@ -2,7 +2,7 @@
 
 ## Description
 
-根据用户提供的文档（.docx / .pdf），智能生成演示文稿（PPT）。适用于技术报告、毕业答辩、科研汇报、商业提案等场景。
+根据用户提供的文档（.docx / .pdf），智能生成演示文稿（PPT）。支持自定义 PPT 模板和逐级字体配置。
 
 ## Workflow
 
@@ -12,40 +12,37 @@
 
 检查 `examples/request.yaml` 是否存在。如果存在，读取其中的用户偏好：
 
-- `page_count`: 目标页数（用户指定的优先级最高，覆盖 prompt 中的默认值）
+- `page_count`: 目标页数（优先级最高）
 - `document`: 要处理的文档路径
-- `meta`: 演示文稿的标题/副标题/作者/日期
-- `theme`: 主题选择
+- `template`: PPT 模板路径（留空则使用内置样式）
+- `meta`: 标题/副标题/作者/日期
+- `theme`: 主题选择（使用模板时此项被模板覆盖）
+- `font`: 字体自定义（选填，覆盖 config.yaml 默认值）
 - `notes`: 特殊要求
 
 如果该文件不存在，使用默认值（15 页），并向用户确认文档路径。
 
 ### Step 1: 读取文档
 
-调用 read_doc 工具提取文档内容和结构：
+调用 read_doc 工具：
 
 ```bash
 python tools/read_doc.py <document_path>
 ```
 
-工具会输出 JSON，包含：
-- `title`: 文档标题
-- `headings`: 章节层级结构
-- `paragraphs`: 正文段落列表
-- `tables`: 表格数据（如有）
+输出 JSON：`title`, `headings`, `paragraphs`, `tables`。
 
 ### Step 2: 生成大纲
 
 根据文档结构，参考 `prompts/outline.md` 的规则生成 PPT 大纲。
 
-**页数**: 优先使用 `request.yaml` 中用户指定的 `page_count`。如果用户未指定，默认 15 页。
+**页数**: 以 `request.yaml` 中的 `page_count` 为准，默认 15 页。
 
 输出格式：
 ```json
 [
-  { "page": 1, "title": "封面" },
-  { "page": 2, "title": "目录" },
-  ...
+  { "page": 1, "title": "封面", "source_sections": ["文档标题"] },
+  { "page": 2, "title": "目录", "source_sections": [] }
 ]
 ```
 
@@ -59,8 +56,8 @@ python tools/read_doc.py <document_path>
 
 对每页输出：
 - `bullets`: 要点列表（3-6条，每条不超过20字）
-- `speaker_notes`: 讲稿（供演讲者参考，1-3句话）
-- `image_suggestion`: 配图建议（关键词描述，用于搜索或生成配图）
+- `speaker_notes`: 讲稿（1-3句话）
+- `image_suggestion`: 配图建议关键词
 
 ### Step 4: 确定版式
 
@@ -78,15 +75,20 @@ python tools/read_doc.py <document_path>
 | SECTION | 章节分隔页 |
 | END | 结束页 |
 
+如果用户指定了模板，版式会自动匹配模板中的 slide layout。
+
 ### Step 5: 生成 PPT 文件
 
-将完整数据组装为 JSON 并写入临时文件，然后调用：
+将完整数据组装为 JSON 写入临时文件，然后调用：
 
 ```bash
 python tools/create_ppt.py <slide_data.json> -c config.yaml -o <output.pptx>
 ```
 
-JSON 结构见下方 Output Format。
+工具会自动：
+- 如果 `request.yaml` 中指定了模板路径，使用该模板的版式和主题
+- 如果没有模板，使用内置的程序化样式
+- 应用 `config.yaml` 中的字体配置（封面标题、内容标题、正文等分别可设）
 
 ### Step 6: 验证与交付
 
@@ -124,7 +126,7 @@ JSON 结构见下方 Output Format。
       "title": "研究背景",
       "layout": "IMAGE_TEXT",
       "bullets": ["要点一", "要点二", "要点三"],
-      "image_suggestion": "配图关键词描述",
+      "image_suggestion": "配图关键词",
       "speaker_notes": "本页讲稿内容..."
     },
     {
@@ -147,10 +149,13 @@ JSON 结构见下方 Output Format。
 - 优先图文混排（IMAGE_TEXT / TEXT_IMAGE / RESULT）
 - 实验/数据结果必须使用 RESULT 版式
 - 总结页不超过 3 条结论
-- 封面和结束页必须简洁
 
 ---
 
 ## Config
 
-`config.yaml` 控制幻灯片尺寸、主题色、字体等参数。生成 PPT 时读取该配置。用户可通过修改该文件自定义样式。
+| 文件 | 用途 |
+|------|------|
+| `config.yaml` | 幻灯片尺寸、主题色、字体层级、模板版式映射 |
+| `examples/request.yaml` | 页数、文档路径、模板选择、特殊要求 |
+| `templates/` | 用户自定义 .pptx 模板存放目录 |
